@@ -263,26 +263,26 @@ static irqreturn_t msm_ts_irq(int irq, void *dev_id)
 													// if we move x around. Pythagoras is our friend.
 				if(pinch_y>1000) pinch_y = 0;
 
+				z = z/4;
+
 				// Finger1
-                	        input_report_abs(ts->input_dev, ABS_MT_TOUCH_MAJOR, 255);
-                      		input_report_abs(ts->input_dev, ABS_MT_WIDTH_MAJOR, 10);
-                        	input_report_abs(ts->input_dev, ABS_MT_POSITION_X, 240 + pinch_x);
-                        	input_report_abs(ts->input_dev, ABS_MT_POSITION_Y, 400 - pinch_y);
-                        	input_mt_sync(ts->input_dev);
+				input_report_abs(ts->input_dev, ABS_MT_PRESSURE, z);
+				input_report_abs(ts->input_dev, ABS_MT_POSITION_X, 240 + pinch_x);
+				input_report_abs(ts->input_dev, ABS_MT_POSITION_Y, 400 - pinch_y);
+				input_mt_sync(ts->input_dev);
 				// Finger2
-                        	input_report_abs(ts->input_dev, ABS_MT_TOUCH_MAJOR, 255);
-                        	input_report_abs(ts->input_dev, ABS_MT_WIDTH_MAJOR, 10);
-                        	input_report_abs(ts->input_dev, ABS_MT_POSITION_X, 240 - pinch_x);
-                        	input_report_abs(ts->input_dev, ABS_MT_POSITION_Y, 400 + pinch_y);
-                        	input_mt_sync(ts->input_dev);
+				input_report_abs(ts->input_dev, ABS_MT_PRESSURE, z);
+				input_report_abs(ts->input_dev, ABS_MT_POSITION_X, 240 - pinch_x);
+				input_report_abs(ts->input_dev, ABS_MT_POSITION_Y, 400 + pinch_y);
+				input_mt_sync(ts->input_dev);
 			}
 		} else {
 			if(ts->zoomhack) {	// Flush faked positions to avoid jumpiness
 				down = 0;
 				ts->zoomhack = 0;
 			} else {
-				input_report_abs(ts->input_dev, ABS_MT_TOUCH_MAJOR, (z+2)/4);
-                	        input_report_abs(ts->input_dev, ABS_MT_WIDTH_MAJOR, 10);
+				z = z/4;
+				input_report_abs(ts->input_dev, ABS_MT_PRESSURE, z);
                        		input_report_abs(ts->input_dev, ABS_MT_POSITION_X, x);
                        		input_report_abs(ts->input_dev, ABS_MT_POSITION_Y, y);
                         	input_mt_sync(ts->input_dev);
@@ -552,8 +552,7 @@ static int __devinit msm_ts_probe(struct platform_device *pdev)
 
 	input_set_abs_params(ts->input_dev, ABS_MT_POSITION_X, pdata->min_x, pdata->max_x, 0, 0);
 	input_set_abs_params(ts->input_dev, ABS_MT_POSITION_Y, pdata->min_y, pdata->max_y, 0, 0);
-	input_set_abs_params(ts->input_dev, ABS_MT_TOUCH_MAJOR, pdata->min_press, pdata->max_press, 0, 0);
-	input_set_abs_params(ts->input_dev, ABS_MT_WIDTH_MAJOR, 0, 255, 0, 0);
+	input_set_abs_params(ts->input_dev, ABS_MT_PRESSURE, pdata->min_press, pdata->max_press, 0, 0);
 
 #ifndef CONFIG_TOUCHSCREEN_VIRTUAL_KEYS
 	for (i = 0; pdata->vkeys_x && (i < pdata->vkeys_x->num_keys); ++i)
