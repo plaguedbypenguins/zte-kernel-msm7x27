@@ -191,8 +191,8 @@ static irqreturn_t msm_ts_irq(int irq, void *dev_id)
 			//z = ( ( 2 * z2 - 2 * z1 - 3) * x) / ( 2 * z1 + 3);
 			z = ( ( z2 - z1 - 2)*x) / ( z1 + 2 );
 			z = ( 2500 - z ) * 1000 / ( 2500 - 900 );
-			//printk("wly: msm_ts_irq,z=%d,z1=%d,z2=%d,x=%d\n",z,z1,z2,x);
-			if( z<=0 ) z = 255;
+			// z is roughly 0 to 1024, but can easily be -3000 on light touches, and 1200 on heavy
+			//printk("wly: msm_ts_irq,z/4=%d,z1=%d,z2=%d,x=%d\n",z/4,z1,z2,x);
 		}
 	//ZTE_TS_WLY_20100729,end
 	/* invert the inputs if necessary */
@@ -282,10 +282,12 @@ static irqreturn_t msm_ts_irq(int irq, void *dev_id)
 				ts->zoomhack = 0;
 			} else {
 				z = z/4;
-				input_report_abs(ts->input_dev, ABS_MT_PRESSURE, z);
-                       		input_report_abs(ts->input_dev, ABS_MT_POSITION_X, x);
-                       		input_report_abs(ts->input_dev, ABS_MT_POSITION_Y, y);
-                        	input_mt_sync(ts->input_dev);
+				if (z > 5) {  // ignore noisy low pressure touches
+					input_report_abs(ts->input_dev, ABS_MT_PRESSURE, z);
+					input_report_abs(ts->input_dev, ABS_MT_POSITION_X, x);
+					input_report_abs(ts->input_dev, ABS_MT_POSITION_Y, y);
+					input_mt_sync(ts->input_dev);
+				}
 			}
 		}
 	}
