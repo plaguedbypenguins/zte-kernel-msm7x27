@@ -277,9 +277,10 @@ static irqreturn_t msm_ts_irq(int irq, void *dev_id)
 				input_mt_sync(ts->input_dev);
 			}
 		} else {
-			if(ts->zoomhack) {	// Flush faked positions to avoid jumpiness
+			if(ts->zoomhack) {
 				down = 0;
-				ts->zoomhack = 0;
+				// leave zoomhack enabled until get hw key up (both fingers lifted)
+				// otherwise can get huge random jumps in position
 			} else {
 				z = z/4;
 				if (z > 5) {  // ignore noisy low pressure touches
@@ -291,6 +292,10 @@ static irqreturn_t msm_ts_irq(int irq, void *dev_id)
 			}
 		}
 	}
+	else {
+		ts->zoomhack = 0;  // only turn off zoomhack when all fingers are up
+ 	}
+
 	input_report_key(ts->input_dev, BTN_TOUCH, down);
 	input_sync(ts->input_dev);
 
