@@ -433,7 +433,10 @@ static void msm_ts_late_resume(struct early_suspend *h)
 #if defined(CONFIG_MACH_MOONCAKE)
 static const char ts_keys_size[] = "0x01:102:40:340:60:50:0x01:139:120:340:60:50:0x01:158:200:340:60:50";
 #elif defined(CONFIG_MACH_V9)
-static const char ts_keys_size[] = "0x01:102:70:850:60:50:0x01:139:230:850:60:50:0x01:158:390:850:60:50";
+// http://source.android.com/tech/input/touch-devices.html
+//    format is 0x01:keyCode:xCentre:yCentre:width:height: ...
+// v9 'offscreen' is 800 to ~853
+static const char ts_keys_size[] = "0x01:102:70:850:80:80:0x01:139:230:850:80:80:0x01:158:390:850:80:80";
 #endif
 
 
