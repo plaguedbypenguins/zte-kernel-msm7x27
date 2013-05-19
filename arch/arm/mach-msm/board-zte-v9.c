@@ -130,7 +130,7 @@ extern struct atmel_i2c_platform_data atmel_data;
 #define MSM_PMEM_ADSP_SIZE	0xB71000
 #define MSM_PMEM_AUDIO_SIZE	0x5B000
 #ifdef CONFIG_FB_MSM_TRIPLE_BUFFER
-#define MSM_FB_SIZE            0x2EE000
+#define MSM_FB_SIZE            0x234000
 #else
 #define MSM_FB_SIZE            0x177000
 #endif
